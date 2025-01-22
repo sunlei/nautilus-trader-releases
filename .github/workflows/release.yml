@@ -18,6 +18,21 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    env:
+      # > --------------------------------------------------
+      # > sccache
+      # https://github.com/Mozilla-Actions/sccache-action
+      SCCACHE_IDLE_TIMEOUT: 0
+      SCCACHE_DIRECT: "true"
+      SCCACHE_CACHE_MULTIARCH: 1
+      SCCACHE_DIR: ${{ github.workspace }}/.cache/sccache
+      RUSTC_WRAPPER: "sccache"
+      CC: "sccache clang"
+      CXX: "sccache clang++"
+      # Incrementally compiled crates cannot be cached by sccache
+      # https://github.com/mozilla/sccache#rust
+      CARGO_INCREMENTAL: 0
+      # > --------------------------------------------------
     steps:
       - name: Checkout repository `self`
         uses: actions/checkout@v4
@@ -28,6 +43,19 @@ jobs:
           repository: nautechsystems/nautilus_trader
           ref: develop
           path: src
+
+      - name: Cached sccache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.SCCACHE_DIR }}
+          key: sccache-${{ runner.os }}-${{ github.workflow }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
+          restore-keys: |
+            sccache-${{ runner.os }}-${{ github.workflow }}-${{ github.job }}-
+            sccache-${{ runner.os }}-${{ github.workflow }}-
+            sccache-${{ runner.os }}-
+
+      - name: Run sccache
+        uses: mozilla-actions/sccache-action@v0.0.7
 
       - name: Setup Python
         uses: actions/setup-python@v5
