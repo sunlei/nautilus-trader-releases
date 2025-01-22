@@ -39,7 +39,7 @@ jobs:
       - name: Checkout repository `self`
         uses: actions/checkout@v4
 
-      - name: Checkout repository `nautilus_trader``
+      - name: Checkout repository `nautilus_trader`
         uses: actions/checkout@v4
         with:
           repository: nautechsystems/nautilus_trader
@@ -61,13 +61,13 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
 
-      # - name: Set up Rust toolchain
-      #   run: |
-      #     rustup toolchain add --profile minimal stable --component clippy,rustfmt
-
-      - name: Update Rust
+      - name: Set up Rust toolchain
         run: |
           rustup update --force stable
+          rustup toolchain add \
+            --profile minimal \
+            --component clippy,rustfmt \
+            stable
 
       # > --------------------------------------------------
       # > sccache
@@ -106,13 +106,13 @@ jobs:
       # > --------------------------------------------------
       # > Build
 
-      - name: Install
-        run: |
-          pushd src
-          poetry install
-          popd
+      # - name: Install NautilusTrader
+      #   run: |
+      #     pushd src
+      #     poetry install
+      #     popd
 
-      - name: Build
+      - name: Build NautilusTrader
         run: |
           pushd src
           poetry build --format wheel
