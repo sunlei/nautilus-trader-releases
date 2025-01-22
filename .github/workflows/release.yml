@@ -47,5 +47,7 @@ jobs:
 
       - name: Install / Build
         run: |
+          pushd src
           poetry install
           poetry build --format wheel
+          popd
