@@ -67,7 +67,7 @@ jobs:
 
       - name: Update Rust
         run: |
-          rustup update stable
+          rustup update --force stable
 
       # > --------------------------------------------------
       # > sccache
