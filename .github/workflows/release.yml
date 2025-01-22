@@ -35,7 +35,7 @@ jobs:
           # python-version: "3.13"
           python-version-file: "src/pyproject.toml"
           # python-version-file: ".python-version"
-          cache: "poetry"
+          # cache: "poetry"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
