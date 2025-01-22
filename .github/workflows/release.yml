@@ -65,9 +65,9 @@ jobs:
         run: |
           rustup update --force stable
           rustup toolchain add \
+            --component clippy,rustfmt \
             --profile minimal \
             stable
-            --component clippy,rustfmt
 
       # > --------------------------------------------------
       # > sccache
