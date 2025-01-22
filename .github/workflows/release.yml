@@ -44,3 +44,8 @@ jobs:
 
       - name: Install poetry
         run: pipx install poetry
+
+      - name: Install / Build
+        run: |
+          poetry install
+          poetry build --format wheel
