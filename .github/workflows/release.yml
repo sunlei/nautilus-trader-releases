@@ -18,7 +18,7 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    name: Publish NautilusTrader (target-arch ${{ matrix.target-arch }} target-cpu ${{ matrix.target-cpu }})
+    name: Publish NautilusTrader (${{ matrix.target-arch }} | ${{ matrix.target-cpu }})
     strategy:
       matrix:
         include:
@@ -33,8 +33,8 @@ jobs:
           #   target-cpu: icelake-server
           # - target-arch: x86_64-unknown-linux-gnu
           #   target-cpu: skylake-avx512
-          # - target-arch: x86_64-unknown-linux-gnu
-          #   target-cpu: sapphirerapids
+          - target-arch: x86_64-unknown-linux-gnu
+            target-cpu: sapphirerapids
           # - target-arch: x86_64-unknown-linux-gnu
           #   target-cpu: emeraldrapids
           # > aarch64-unknown-linux-gnu
@@ -114,8 +114,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.SCCACHE_DIR }}
-          key: sccache-${{ runner.os }}-${{ github.workflow }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
+          key: sccache-${{ runner.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
           restore-keys: |
+            sccache-${{ runner.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-
+            sccache-${{ runner.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-
             sccache-${{ runner.os }}-${{ github.workflow }}-${{ github.job }}-
             sccache-${{ runner.os }}-${{ github.workflow }}-
             sccache-${{ runner.os }}-
