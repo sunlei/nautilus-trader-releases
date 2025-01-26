@@ -40,8 +40,8 @@ jobs:
           # - target-arch: x86_64-unknown-linux-gnu
           #   target-cpu: emeraldrapids
           # > aarch64-unknown-linux-gnu
-          - target-arch: aarch64-unknown-linux-gnu
-            target-cpu: generic # 默认
+          # - target-arch: aarch64-unknown-linux-gnu
+          #   target-cpu: generic # 默认
           # - target-arch: aarch64-unknown-linux-gnu
           #   target-cpu: neoverse-n1 # Graviton2
           # - target-arch: aarch64-unknown-linux-gnu
