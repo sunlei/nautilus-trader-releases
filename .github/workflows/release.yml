@@ -18,11 +18,33 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        include:
+          - target-arch: x86_64-unknown-linux-gnu
+            target-cpu:
+              # - x86-64 # 默认
+              # - x86-64-v4
+              - cascadelake
+              # - icelake-server
+              # - skylake-avx512
+              # - sapphirerapids
+              # - emeraldrapids
+          - target-arch: aarch64-unknown-linux-gnu
+            target-cpu:
+              - generic # 默认
+              # - neoverse-n1 # Graviton2
+              # - neoverse-v1 # Graviton3
+              # - neoverse-v2 # Graviton4
     defaults:
       run:
         shell: bash
     env:
       BUILD_MODE: release
+      TARGET_ARCH: ${{ matrix.target_arch }}
+      TARGET_CPU: ${{ matrix.target_cpu }}
       # > --------------------------------------------------
       # > sccache
       # https://github.com/Mozilla-Actions/sccache-action
