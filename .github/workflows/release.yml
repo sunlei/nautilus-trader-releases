@@ -122,6 +122,7 @@ jobs:
       - name: Set up Rust toolchain
         run: |
           rustup update --force stable
+          rustup target add ${{ matrix.target-arch }}
           rustup toolchain add \
             --component clippy,rustfmt \
             --profile minimal \
