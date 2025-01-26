@@ -160,7 +160,7 @@ jobs:
       - name: Update env vars
         run: |
           echo 'CARGO_BUILD_TARGET=${{ matrix.target-arch }}' >> $GITHUB_ENV
-          echo 'RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }} ${{ env.RUSTFLAGS:- }}' >> $GITHUB_ENV
+          echo 'RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }} ${RUSTFLAGS:+ $RUSTFLAGS}' >> $GITHUB_ENV
 
       - name: Print env vars
         run: |
