@@ -160,7 +160,11 @@ jobs:
       - name: Update env vars
         run: |
           echo 'CARGO_BUILD_TARGET=${{ matrix.target-arch }}' >> $GITHUB_ENV
-          echo 'RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }} ${RUSTFLAGS:-}' >> $GITHUB_ENV
+          echo 'RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }} ${{ env.RUSTFLAGS:- }}' >> $GITHUB_ENV
+
+      - name: Print env vars
+        run: |
+          env
 
       # - name: Install NautilusTrader
       #   run: |
@@ -168,12 +172,12 @@ jobs:
       #     poetry install
       #     popd
 
-      - name: Build NautilusTrader
-        run: |
-          pushd src
-          poetry build --format wheel
-          popd
+      # - name: Build NautilusTrader
+      #   run: |
+      #     pushd src
+      #     poetry build --format wheel
+      #     popd
 
-      - name: List dist
-        run: |
-          tree src/dist
+      # - name: List dist
+      #   run: |
+      #     tree src/dist
