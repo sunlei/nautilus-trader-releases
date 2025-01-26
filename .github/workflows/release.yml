@@ -57,7 +57,7 @@ jobs:
       TARGET_CPU: ${{ matrix.target-cpu }}
       # > --------------------------------------------------
       # > cargo
-      CARGO_LOG: info
+      # CARGO_LOG: info
       RUST_BACKTRACE: 1
       CARGO_BUILD_TARGET: ${{ matrix.target-arch }}
       RUSTFLAGS: -C target-cpu=${{ matrix.target-cpu }}
