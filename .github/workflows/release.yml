@@ -56,8 +56,8 @@ jobs:
       # > --------------------------------------------------
       # > cargo
       CARGO_LOG: debug
-      CARGO_BUILD_TARGET: ${{ matrix.target-arch }}
-      RUSTFLAGS: "-C target-cpu=${{ matrix.target-cpu }} ${RUSTFLAGS:-}"
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: 1
       # > --------------------------------------------------
       # > sccache
       # https://github.com/Mozilla-Actions/sccache-action
@@ -157,6 +157,11 @@ jobs:
 
       # > --------------------------------------------------
       # > Build
+      - name: Update env vars
+        run: |
+          echo 'CARGO_BUILD_TARGET=${{ matrix.target-arch }}' >> $GITHUB_ENV
+          echo 'RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }} ${RUSTFLAGS:-}' >> $GITHUB_ENV
+
       # - name: Install NautilusTrader
       #   run: |
       #     pushd src
