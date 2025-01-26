@@ -54,6 +54,11 @@ jobs:
       TARGET_ARCH: ${{ matrix.target-arch }}
       TARGET_CPU: ${{ matrix.target-cpu }}
       # > --------------------------------------------------
+      # > cargo
+      CARGO_LOG: debug
+      CARGO_BUILD_TARGET: ${{ matrix.target-arch }}
+      RUSTFLAGS: "-C target-cpu=${{ matrix.target-cpu }} ${RUSTFLAGS:-}"
+      # > --------------------------------------------------
       # > sccache
       # https://github.com/Mozilla-Actions/sccache-action
       SCCACHE_IDLE_TIMEOUT: 0
@@ -66,8 +71,15 @@ jobs:
       # Incrementally compiled crates cannot be cached by sccache
       # https://github.com/mozilla/sccache#rust
       CARGO_INCREMENTAL: 0
-      # > --------------------------------------------------
     steps:
+      # > --------------------------------------------------
+      # > OS
+      - name: Install / Update OS dependencies
+        run: sudo apt install -y curl clang git libssl-dev make pkg-config
+
+      - name: Setup mold
+        uses: rui314/setup-mold@v1
+
       # > --------------------------------------------------
       # > Repository
       - name: Checkout repository `self`
@@ -79,11 +91,6 @@ jobs:
           repository: nautechsystems/nautilus_trader
           ref: develop
           path: src
-
-      # > --------------------------------------------------
-      # > OS
-      - name: Install / Update OS dependencies
-        run: sudo apt install -y curl clang git libssl-dev make pkg-config
 
       # > --------------------------------------------------
       # > Rust
