@@ -57,6 +57,7 @@ jobs:
       TARGET_CPU: ${{ matrix.target-cpu }}
       # > --------------------------------------------------
       # > cargo
+      CARGO_TARGET_DIR: ${{ github.workspace }}/.cache/cargo/target
       # CARGO_LOG: debug
       CARGO_TERM_VERBOSE: true
       RUST_BACKTRACE: 1
