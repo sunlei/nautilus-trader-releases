@@ -18,10 +18,14 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    name: Publish NautilusTrader (target-arch ${{ matrix.target-arch }} target-cpu ${{ matrix.target-cpu }})
     strategy:
       matrix:
         os:
           - ubuntu-latest
+        target-arch:
+          - x86_64-unknown-linux-gnu
+          - aarch64-unknown-linux-gnu
         include:
           - target-arch: x86_64-unknown-linux-gnu
             target-cpu:
