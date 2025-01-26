@@ -24,7 +24,9 @@ jobs:
         include:
           # > x86_64-unknown-linux-gnu
           - target-arch: x86_64-unknown-linux-gnu
-            target-cpu: x86-64 # 默认
+            target-cpu: generic # 默认
+          # - target-arch: x86_64-unknown-linux-gnu
+          #   target-cpu: x86-64
           # - target-arch: x86_64-unknown-linux-gnu
           #   target-cpu: x86-64-v4
           # - target-arch: x86_64-unknown-linux-gnu
@@ -76,7 +78,15 @@ jobs:
       # > --------------------------------------------------
       # > OS
       - name: Install / Update OS dependencies
-        run: sudo apt install -y curl clang git libssl-dev make pkg-config
+        run: |
+          sudo apt install -y \
+            curl \
+            clang \
+            git \
+            libssl-dev \
+            make \
+            pkg-config \
+            binutils
 
       - name: Setup mold
         uses: rui314/setup-mold@v1
@@ -163,9 +173,9 @@ jobs:
       #     echo 'CARGO_BUILD_TARGET=${{ matrix.target-arch }}' >> $GITHUB_ENV
       #     echo 'RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }}' >> $GITHUB_ENV
 
-      - name: Print env vars
-        run: |
-          env
+      # - name: Print env vars
+      #   run: |
+      #     env | sort
 
       # - name: Install NautilusTrader
       #   run: |
@@ -173,12 +183,12 @@ jobs:
       #     poetry install
       #     popd
 
-      # - name: Build NautilusTrader
-      #   run: |
-      #     pushd src
-      #     poetry build --format wheel
-      #     popd
+      - name: Build NautilusTrader
+        run: |
+          pushd src
+          poetry build --format wheel
+          popd
 
-      # - name: List dist
-      #   run: |
-      #     tree src/dist
+      - name: List dist
+        run: |
+          tree src/dist
