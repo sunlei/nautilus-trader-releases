@@ -60,7 +60,8 @@ jobs:
       CARGO_LOG: info
       RUST_BACKTRACE: 1
       CARGO_BUILD_TARGET: ${{ matrix.target-arch }}
-      RUSTFLAGS: -C target-cpu=${{ matrix.target-cpu }} -Z tune-cpu=${{ matrix.target-cpu }}
+      RUSTFLAGS: -C target-cpu=${{ matrix.target-cpu }}
+      # -Z tune-cpu=${{ matrix.target-cpu }} # the option `Z` is only accepted on the nightly compiler
       # > --------------------------------------------------
       # > sccache
       # https://github.com/Mozilla-Actions/sccache-action
