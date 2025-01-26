@@ -59,7 +59,7 @@ jobs:
       # > cargo
       CARGO_TARGET_DIR: ${{ github.workspace }}/.cache/cargo/target
       # CARGO_LOG: debug
-      CARGO_TERM_VERBOSE: true
+      # CARGO_TERM_VERBOSE: true
       RUST_BACKTRACE: 1
       CARGO_BUILD_TARGET: ${{ matrix.target-arch }}
       RUSTFLAGS: -C target-cpu=${{ matrix.target-cpu }}
@@ -125,8 +125,9 @@ jobs:
 
       - name: Set up Rust toolchain
         run: |
-          rustup update --force stable
+          rustup self update
           rustup target add ${{ matrix.target-arch }}
+          rustup update --force stable
           rustup toolchain add \
             --component clippy,rustfmt \
             --profile minimal \
@@ -192,6 +193,7 @@ jobs:
       - name: Build NautilusTrader
         run: |
           pushd src
+          poetry install
           poetry build --format wheel
           popd
 
