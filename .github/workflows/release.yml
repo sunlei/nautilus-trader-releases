@@ -60,7 +60,7 @@ jobs:
       CARGO_LOG: debug
       RUST_BACKTRACE: 1
       CARGO_BUILD_TARGET: ${{ matrix.target-arch }}
-      RUSTFLAGS: -C target-cpu=${{ matrix.target-cpu }}
+      RUSTFLAGS: -C target-cpu=${{ matrix.target-cpu }} -Z tune-cpu=${{ matrix.target-cpu }}
       # > --------------------------------------------------
       # > sccache
       # https://github.com/Mozilla-Actions/sccache-action
