@@ -18,7 +18,7 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    name: Publish NautilusTrader (${{ matrix.target-arch }} | ${{ matrix.target-cpu }})
+    name: publish (${{ matrix.target-arch }} | ${{ matrix.target-cpu }})
     strategy:
       matrix:
         include:
@@ -51,8 +51,8 @@ jobs:
         shell: bash
     env:
       BUILD_MODE: release
-      TARGET_ARCH: ${{ matrix.target_arch }}
-      TARGET_CPU: ${{ matrix.target_cpu }}
+      TARGET_ARCH: ${{ matrix.target-arch }}
+      TARGET_CPU: ${{ matrix.target-cpu }}
       # > --------------------------------------------------
       # > sccache
       # https://github.com/Mozilla-Actions/sccache-action
