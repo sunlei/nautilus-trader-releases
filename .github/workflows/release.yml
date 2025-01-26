@@ -18,6 +18,9 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     env:
       BUILD_MODE: release
       # > --------------------------------------------------
@@ -36,7 +39,7 @@ jobs:
       # > --------------------------------------------------
     steps:
       # > --------------------------------------------------
-      # > repository
+      # > Repository
       - name: Checkout repository `self`
         uses: actions/checkout@v4
 
@@ -48,7 +51,7 @@ jobs:
           path: src
 
       # > --------------------------------------------------
-      # > repository
+      # > OS
       - name: Install / Update OS dependencies
         run: sudo apt install -y curl clang git libssl-dev make pkg-config
 
@@ -94,6 +97,7 @@ jobs:
       # > Python
       - name: Setup Python
         uses: actions/setup-python@v5
+        id: python-install
         with:
           # python-version: "3.13"
           python-version-file: "src/pyproject.toml"
@@ -104,6 +108,10 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+
+      - name: Update env vars
+        run: |
+          echo 'PIPX_DEFAULT_PYTHON=${{ steps.python-install.outputs.python-path }}' >> $GITHUB_ENV
 
       - name: Install poetry
         run: pipx install poetry
