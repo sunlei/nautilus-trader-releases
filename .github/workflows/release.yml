@@ -79,6 +79,13 @@ jobs:
       CARGO_INCREMENTAL: 0
     steps:
       # > --------------------------------------------------
+      # > Debug
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
+      # > --------------------------------------------------
       # > OS
       - name: Install / Update OS dependencies
         run: |
