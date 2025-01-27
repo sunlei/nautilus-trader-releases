@@ -191,9 +191,9 @@ jobs:
       #   run: |
       #     env | sort
 
-      # - name: Replace `build.py`
-      #   run: |
-      #     cp scripts/build.py src/build.py
+      - name: Replace `build.py`
+        run: |
+          cp scripts/build.py src/build.py
 
       # - name: Install NautilusTrader
       #   run: |
@@ -201,13 +201,13 @@ jobs:
       #     poetry install
       #     popd
 
-      # - name: Build NautilusTrader
-      #   run: |
-      #     pushd src
-      #     # poetry install
-      #     poetry build --format wheel
-      #     popd
+      - name: Build NautilusTrader
+        run: |
+          pushd src
+          # poetry install
+          poetry build --format wheel
+          popd
 
-      # - name: List dist
-      #   run: |
-      #     tree src/dist
+      - name: List dist
+        run: |
+          tree src/dist
