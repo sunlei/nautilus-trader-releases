@@ -53,8 +53,8 @@ jobs:
         shell: bash
     env:
       BUILD_MODE: release
-      TARGET_ARCH: ${{ matrix.target-arch }}
-      TARGET_CPU: ${{ matrix.target-cpu }}
+      # TARGET_ARCH: ${{ matrix.target-arch }}
+      # TARGET_CPU: ${{ matrix.target-cpu }}
       # > --------------------------------------------------
       # > cargo
       CARGO_TARGET_DIR: ${{ github.workspace }}/.cache/cargo/target
@@ -175,10 +175,10 @@ jobs:
 
       # > --------------------------------------------------
       # > Debug
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+      #   with:
+      #     limit-access-to-actor: true
 
       # > --------------------------------------------------
       # > Build
@@ -197,10 +197,14 @@ jobs:
       #     poetry install
       #     popd
 
+      - name: Replace `build.py`
+        run: |
+          cp scripts/build.py src/build.py
+
       - name: Build NautilusTrader
         run: |
           pushd src
-          poetry install
+          # poetry install
           poetry build --format wheel
           popd
 
