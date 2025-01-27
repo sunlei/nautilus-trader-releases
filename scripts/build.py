@@ -92,13 +92,19 @@ else:  # Linux
     RUST_STATIC_LIB_EXT = "a"
     RUST_DYLIB_EXT = "so"
 
-ENV_CARGO_TARGET_DIR = os.environ.get("CARGO_TARGET_DIR")
-ENV_CARGO_BUILD_TARGET = os.environ.get("CARGO_BUILD_TARGET", BUILD_MODE)
-CARGO_TARGET_DIR = (
-    Path(ENV_CARGO_TARGET_DIR) / ENV_CARGO_BUILD_TARGET
-    if ENV_CARGO_TARGET_DIR
-    else Path.cwd() / "nautilus_core" / "target" / ENV_CARGO_BUILD_TARGET
-)
+# ENV_CARGO_TARGET_DIR = os.environ.get("CARGO_TARGET_DIR")
+# ENV_CARGO_BUILD_TARGET = os.environ.get("CARGO_BUILD_TARGET")
+# CARGO_RELEASE_DIR = Path(ENV_CARGO_BUILD_TARGET) / BUILD_MODE if ENV_CARGO_BUILD_TARGET else BUILD_MODE
+# CARGO_TARGET_DIR = (
+#     Path(ENV_CARGO_TARGET_DIR) / CARGO_RELEASE_DIR
+#     if ENV_CARGO_TARGET_DIR
+#     else Path.cwd() / "nautilus_core" / "target" / CARGO_RELEASE_DIR
+# )
+
+
+CARGO_TARGET_DIR = Path(os.environ.get("CARGO_TARGET_DIR", Path.cwd() / "nautilus_core" / "target"))
+CARGO_BUILD_TARGET = os.environ.get("CARGO_BUILD_TARGET", "")
+CARGO_TARGET_DIR = CARGO_TARGET_DIR / (CARGO_BUILD_TARGET if CARGO_BUILD_TARGET else "") / BUILD_MODE
 
 # Directories with headers to include
 RUST_INCLUDES = ["nautilus_trader/core/includes"]
