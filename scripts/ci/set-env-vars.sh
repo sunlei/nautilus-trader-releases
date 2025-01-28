@@ -11,14 +11,19 @@ set -euo pipefail
   # echo "CARGO_TERM_VERBOSE=true" >> "${GITHUB_ENV}"
   echo "RUST_BACKTRACE=1"
 
-  echo "CARGO_BUILD_TARGET=${TARGET_ARCH}"
-
-  # -Z tune-cpu=${TARGET_CPU} # the option `Z` is only accepted on the nightly compiler
-  if [[ "${TARGET_ARCH}" == "aarch64-apple-darwin" ]]; then
-    echo "RUSTFLAGS=-C target-cpu=${TARGET_CPU} -C link-arg=-undefined -C link-arg=dynamic_lookup"
-  else
+  if [[ "${TARGET_ARCH}" != "aarch64-apple-darwin" ]]; then
+    echo "CARGO_BUILD_TARGET=${TARGET_ARCH}"
     echo "RUSTFLAGS=-C target-cpu=${TARGET_CPU}"
   fi
+
+  # -Z tune-cpu=${TARGET_CPU} # the option `Z` is only accepted on the nightly compiler
+  # if [[ "${TARGET_ARCH}" == "aarch64-apple-darwin" ]]; then
+  #   echo "CARGO_BUILD_TARGET=${TARGET_ARCH}"
+  #   echo "RUSTFLAGS=-C target-cpu=${TARGET_CPU} -C link-arg=-undefined -C link-arg=dynamic_lookup"
+  # else
+  #   echo "CARGO_BUILD_TARGET=${TARGET_ARCH}"
+  #   echo "RUSTFLAGS=-C target-cpu=${TARGET_CPU}"
+  # fi
 
   # > --------------------------------------------------
   # > sccache
