@@ -84,6 +84,9 @@ jobs:
       # https://github.com/mozilla/sccache#rust
       CARGO_INCREMENTAL: 0
     steps:
+      - name: Checkout repository `self`
+        uses: actions/checkout@v4
+
       - name: common-setup
         uses: ./.github/actions/common-setup
         with:
@@ -91,9 +94,6 @@ jobs:
 
       # > --------------------------------------------------
       # > Repository
-      - name: Checkout repository `self`
-        uses: actions/checkout@v4
-
       - name: Checkout repository `nautilus_trader`
         uses: actions/checkout@v4
         with:
