@@ -10,6 +10,37 @@ runs:
   using: "composite"
   steps:
     # > --------------------------------------------------
+    # > ENV
+    - name: Set env vars (common)
+      shell: bash
+      run: |
+        echo "BUILD_MODE=release" >> $GITHUB_ENV
+        # echo "TARGET_ARCH=${{ matrix.arch-cpu.target-arch }}" >> $GITHUB_ENV
+        # echo "TARGET_CPU=${{ matrix.arch-cpu.target-cpu }}" >> $GITHUB_ENV
+        # > --------------------------------------------------
+        # > cargo
+        echo "CARGO_TARGET_DIR=${{ github.workspace }}/.cache/cargo/target" >> $GITHUB_ENV
+        # echo "CARGO_LOG=debug" >> $GITHUB_ENV
+        # echo "CARGO_TERM_VERBOSE=true" >> $GITHUB_ENV
+        echo "RUST_BACKTRACE=1" >> $GITHUB_ENV
+        echo "CARGO_BUILD_TARGET=${{ matrix.arch-cpu.target-arch }}" >> $GITHUB_ENV
+        echo "RUSTFLAGS=-C target-cpu=${{ matrix.arch-cpu.target-cpu }}" >> $GITHUB_ENV
+        # -Z tune-cpu=${{ matrix.arch-cpu.target-cpu }} # the option `Z` is only accepted on the nightly compiler
+        # > --------------------------------------------------
+        # > sccache
+        # https://github.com/Mozilla-Actions/sccache-action
+        echo "SCCACHE_IDLE_TIMEOUT=0" >> $GITHUB_ENV
+        echo "SCCACHE_DIRECT=true" >> $GITHUB_ENV
+        echo "SCCACHE_CACHE_MULTIARCH=1" >> $GITHUB_ENV
+        echo "SCCACHE_DIR=${{ github.workspace }}/.cache/sccache" >> $GITHUB_ENV
+        echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
+        echo "CC=sccache clang" >> $GITHUB_ENV
+        echo "CXX=sccache clang++" >> $GITHUB_ENV
+        # Incrementally compiled crates cannot be cached by sccache
+        # https://github.com/mozilla/sccache#rust
+        echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
+
+    # > --------------------------------------------------
     # > OS
     - name: Install / Update OS dependencies
       if: runner.os == 'Linux'

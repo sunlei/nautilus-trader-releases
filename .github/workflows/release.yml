@@ -18,12 +18,11 @@ jobs:
     permissions:
       contents: write
     name: publish ${{ matrix.os }} (${{ matrix.arch-cpu.target-arch }} | ${{ matrix.arch-cpu.target-cpu }})
-    # runs-on: ubuntu-latest
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os:
-          # - ubuntu-24.04
+          - ubuntu-24.04
           - ubuntu-22.04
           # - macos-latest
         arch-cpu:
@@ -57,32 +56,6 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      BUILD_MODE: release
-      # TARGET_ARCH: ${{ matrix.arch-cpu.target-arch }}
-      # TARGET_CPU: ${{ matrix.arch-cpu.target-cpu }}
-      # > --------------------------------------------------
-      # > cargo
-      CARGO_TARGET_DIR: ${{ github.workspace }}/.cache/cargo/target
-      # CARGO_LOG: debug
-      # CARGO_TERM_VERBOSE: true
-      RUST_BACKTRACE: 1
-      CARGO_BUILD_TARGET: ${{ matrix.arch-cpu.target-arch }}
-      RUSTFLAGS: -C target-cpu=${{ matrix.arch-cpu.target-cpu }}
-      # -Z tune-cpu=${{ matrix.arch-cpu.target-cpu }} # the option `Z` is only accepted on the nightly compiler
-      # > --------------------------------------------------
-      # > sccache
-      # https://github.com/Mozilla-Actions/sccache-action
-      SCCACHE_IDLE_TIMEOUT: 0
-      SCCACHE_DIRECT: "true"
-      SCCACHE_CACHE_MULTIARCH: 1
-      SCCACHE_DIR: ${{ github.workspace }}/.cache/sccache
-      RUSTC_WRAPPER: "sccache"
-      CC: "sccache clang"
-      CXX: "sccache clang++"
-      # Incrementally compiled crates cannot be cached by sccache
-      # https://github.com/mozilla/sccache#rust
-      CARGO_INCREMENTAL: 0
     steps:
       - name: Checkout repository `self`
         uses: actions/checkout@v4
@@ -113,53 +86,5 @@ jobs:
       #     which yq
       #     yq --version
 
-      # > --------------------------------------------------
-      # > Build
-      # - name: Update env vars
-      #   run: |
-      #     echo 'CARGO_BUILD_TARGET=${{ matrix.arch-cpu.target-arch }}' >> $GITHUB_ENV
-      #     echo 'RUSTFLAGS=-C target-cpu=${{ matrix.arch-cpu.target-cpu }}' >> $GITHUB_ENV
-
-      # - name: Print env vars
-      #   run: |
-      #     env | sort
-
-      - name: Replace `build.py`
-        run: |
-          cp scripts/build.py src/build.py
-
-      - name: Set version
-        run: |
-          base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
-
-          dev_version="dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}"
-          local_version="cpu.${{ matrix.arch-cpu.target-cpu }}"
-          new_version="${base_version}.${dev_version}.${local_version}"
-
-          poetry version --directory=src ${new_version}
-          echo "RELEASE_VERSION=${base_version}.${dev_version}" >> $GITHUB_ENV
-
-          echo "Set version to ${new_version}"
-
-      # - name: Install NautilusTrader
-      #   run: |
-      #     pushd src
-      #     poetry install
-      #     popd
-
-      - name: Build NautilusTrader
-        run: |
-          pushd src
-          poetry build --format wheel
-          popd
-
-      - name: List dist
-        run: |
-          tree src/dist
-
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: src/dist/*
-          tag_name: v${{ env.RELEASE_VERSION }}
-          name: v${{ env.RELEASE_VERSION }}
+      - name: common-wheel-build
+        uses: ./.github/actions/common-wheel-build

@@ -1,0 +1,66 @@
+name: common-wheel-build
+description: Common wheel build and install
+
+inputs:
+  python-version:
+    description: The Python version to setup
+    required: true
+
+# This action runs for linux and macos only
+runs:
+  using: "composite"
+  steps:
+    # > --------------------------------------------------
+    # > Build
+    # - name: Update env vars
+    #   run: |
+    #     echo 'CARGO_BUILD_TARGET=${{ matrix.arch-cpu.target-arch }}' >> $GITHUB_ENV
+    #     echo 'RUSTFLAGS=-C target-cpu=${{ matrix.arch-cpu.target-cpu }}' >> $GITHUB_ENV
+
+    # - name: Print env vars
+    #   run: |
+    #     env | sort
+
+    - name: Replace `build.py`
+      shell: bash
+      run: |
+        cp scripts/build.py src/build.py
+
+    - name: Set version
+      shell: bash
+      run: |
+        base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
+
+        dev_version="dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}"
+        local_version="cpu.${{ matrix.arch-cpu.target-cpu }}"
+        new_version="${base_version}.${dev_version}.${local_version}"
+
+        poetry version --directory=src ${new_version}
+        echo "RELEASE_VERSION=${base_version}.${dev_version}" >> $GITHUB_ENV
+
+        echo "Set version to ${new_version}"
+
+    # - name: Install NautilusTrader
+    #   run: |
+    #     pushd src
+    #     poetry install
+    #     popd
+
+    - name: Build NautilusTrader
+      shell: bash
+      run: |
+        pushd src
+        poetry build --format wheel
+        popd
+
+    - name: List dist
+      shell: bash
+      run: |
+        tree src/dist
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: src/dist/*
+        tag_name: v${{ env.RELEASE_VERSION }}
+        name: v${{ env.RELEASE_VERSION }}
