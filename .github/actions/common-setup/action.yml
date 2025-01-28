@@ -29,9 +29,9 @@ runs:
           libssl-dev \
           make \
           pkg-config \
-          # g++-aarch64-linux-gnu \
-          # gcc-aarch64-linux-gnu \
           binutils
+      # g++-aarch64-linux-gnu \
+      # gcc-aarch64-linux-gnu \
 
     - name: Setup mold
       if: runner.os == 'Linux'
