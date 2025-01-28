@@ -181,6 +181,18 @@ jobs:
       #     limit-access-to-actor: true
 
       # > --------------------------------------------------
+      # > mise
+      - name: Setup mise
+        run: |
+          curl https://mise.run | sh
+          echo "$HOME/.local/share/mise/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/share/mise/shims" >> $GITHUB_PATH
+
+      - name: Install yq
+        run: |
+          mise use -g yq
+
+      # > --------------------------------------------------
       # > Build
       # - name: Update env vars
       #   run: |
