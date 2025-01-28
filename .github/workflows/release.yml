@@ -187,15 +187,15 @@ jobs:
 
       # > --------------------------------------------------
       # > mise
-      - name: Setup mise
-        run: |
-          curl https://mise.run | sh
-          echo "$HOME/.local/share/mise/bin" >> $GITHUB_PATH
-          echo "$HOME/.local/share/mise/shims" >> $GITHUB_PATH
+      # - name: Setup mise
+      #   run: |
+      #     curl https://mise.run | sh
+      #     echo "$HOME/.local/share/mise/bin" >> $GITHUB_PATH
+      #     echo "$HOME/.local/share/mise/shims" >> $GITHUB_PATH
 
-      - name: Install yq
-        run: |
-          mise use -g yq
+      # - name: Install yq
+      #   run: |
+      #     mise use -g yq
 
       # > --------------------------------------------------
       # > Build
@@ -211,6 +211,15 @@ jobs:
       - name: Replace `build.py`
         run: |
           cp scripts/build.py src/build.py
+
+      - name: Update version in `pyproject.toml`
+        run: |
+          base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
+          suffix=".dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}.cpu.${{ matrix.target-cpu }}"
+          new_version="${base_version}${suffix}"
+          yq -i '.tool.poetry.version = "${new_version}"' src/pyproject.toml
+
+          echo "Set version to ${new_version}"
 
       # - name: Install NautilusTrader
       #   run: |
