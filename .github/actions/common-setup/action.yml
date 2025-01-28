@@ -106,7 +106,6 @@ runs:
     - name: Set up Rust toolchain
       shell: bash
       run: |
-        rustup self update
         rustup target add ${{ matrix.arch-cpu.target-arch }}
         rustup update --force stable
         rustup toolchain add \
