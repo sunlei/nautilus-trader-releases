@@ -19,6 +19,7 @@ jobs:
       contents: write
     name: publish ${{ matrix.os }} (${{ matrix.target-arch }} | ${{ matrix.target-cpu }})
     # runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os:
