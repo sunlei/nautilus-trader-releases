@@ -99,15 +99,15 @@ jobs:
 
       # > --------------------------------------------------
       # > Repository
-      - name: Checkout repository `self`
-        uses: actions/checkout@v4
-
       - name: Checkout repository `nautilus_trader`
         uses: actions/checkout@v4
         with:
           repository: nautechsystems/nautilus_trader
           ref: develop
           path: src
+
+      - name: Checkout repository `self`
+        uses: actions/checkout@v4
 
       # > --------------------------------------------------
       # > Rust
@@ -216,11 +216,13 @@ jobs:
       - name: Set version
         run: |
           base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
-          suffix=".dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}.cpu.${{ matrix.target-cpu }}"
-          new_version="${base_version}${suffix}"
+
+          release_version="dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}"
+          target_cpu="cpu.${{ matrix.target-cpu }}"
+          new_version="${base_version}.${release_version}.${target_cpu}"
 
           poetry version --directory=src ${new_version}
-          echo "RELEASE_VERSION=${new_version}" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=${release_version}" >> $GITHUB_ENV
 
           echo "Set version to ${new_version}"
 
