@@ -17,14 +17,14 @@ jobs:
   publish-nautilus-trader:
     permissions:
       contents: write
-    runs-on: ubuntu-latest
     name: publish ${{ matrix.os }} (${{ matrix.target-arch }} | ${{ matrix.target-cpu }})
+    # runs-on: ubuntu-latest
     strategy:
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-24.04
           - ubuntu-22.04
-          - macos-latest
+          # - macos-latest
         include:
           # > x86_64-unknown-linux-gnu
           - target-arch: x86_64-unknown-linux-gnu
