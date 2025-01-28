@@ -91,13 +91,13 @@ runs:
       uses: actions/cache@v4
       with:
         path: ${{ env.SCCACHE_DIR }}
-        key: sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
+        key: sccache-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
         restore-keys: |
-          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-
-          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-
-          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-
-          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-
-          sccache-${{ runner.os }}-${{ matrix.os }}-
+          sccache-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-
+          sccache-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-
+          sccache-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-
+          sccache-${{ matrix.os }}-${{ github.workflow }}-
+          sccache-${{ matrix.os }}-
 
     - name: Run sccache
       uses: mozilla-actions/sccache-action@v0.0.7
