@@ -36,7 +36,7 @@ jobs:
             target-cpu: sapphirerapids
           - os: macos-latest
             target-arch: aarch64-apple-darwin
-            target-cpu: generic
+            target-cpu: "" # 使用 generic 时，ring 无法编译
     env:
       TARGET_ARCH: ${{ matrix.target-arch }}
       TARGET_CPU: ${{ matrix.target-cpu }}

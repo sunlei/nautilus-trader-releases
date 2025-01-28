@@ -29,8 +29,8 @@ runs:
           libssl-dev \
           make \
           pkg-config \
-          g++-aarch64-linux-gnu \
-          gcc-aarch64-linux-gnu \
+          # g++-aarch64-linux-gnu \
+          # gcc-aarch64-linux-gnu \
           binutils
 
     - name: Setup mold
@@ -54,14 +54,10 @@ runs:
     #   with:
     #     enable-cache: true
 
-    - name: Update env vars
-      shell: bash
-      run: |
-        echo 'PIPX_DEFAULT_PYTHON=${{ steps.python-install.outputs.python-path }}' >> $GITHUB_ENV
-
     - name: Install poetry
       shell: bash
       run: |
+        echo "PIPX_DEFAULT_PYTHON=${{ steps.python-install.outputs.python-path }}" >> $GITHUB_ENV
         pipx install poetry
 
     # > --------------------------------------------------
