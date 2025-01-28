@@ -29,14 +29,24 @@ runs:
     - name: Set version
       shell: bash
       run: |
-        base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
+        # Format: {semver}.dev{date}+{build_number}.cpu.{target_cpu}
+        # Example: 1.208.0.dev20251212+7001.cpu.sapphirerapids
 
-        dev_version="dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}"
-        local_version="cpu.${{ matrix.arch-cpu.target-cpu }}"
-        new_version="${base_version}.${dev_version}.${local_version}"
+        base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
+        target_cpu=${{ matrix.arch-cpu.target-cpu }}
+
+        dev_version="dev$(date -u +%Y%m%d)+${GITHUB_RUN_NUMBER}"
+        release_version=${base_version}.${dev_version}
+        local_version_cpu="cpu.${target_cpu}"
+
+        if [ "${target_cpu}" == "generic" ]; then
+          new_version="${release_version}"
+        else
+          new_version="${release_version}.${local_version_cpu}"
+        fi
 
         poetry version --directory=src ${new_version}
-        echo "RELEASE_VERSION=${base_version}.${dev_version}" >> $GITHUB_ENV
+        echo "RELEASE_VERSION=${release_version}" >> $GITHUB_ENV
 
         echo "Set version to ${new_version}"
 
