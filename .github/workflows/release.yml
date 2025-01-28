@@ -14,7 +14,7 @@ on:
 #     types: [on-demand-release]
 
 jobs:
-  publish-nautilus-trader:
+  publish-linux:
     permissions:
       contents: write
     name: publish ${{ matrix.os }} (${{ matrix.arch-cpu.target-arch }} | ${{ matrix.arch-cpu.target-cpu }})
@@ -85,6 +85,42 @@ jobs:
       #   run: |
       #     which yq
       #     yq --version
+
+      - name: common-wheel-build
+        uses: ./.github/actions/common-wheel-build
+
+  publish-macos:
+    permissions:
+      contents: write
+    name: publish ${{ matrix.os }} (${{ matrix.arch-cpu.target-arch }} | ${{ matrix.arch-cpu.target-cpu }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - macos-latest
+        arch-cpu:
+          - target-arch: aarch64-apple-darwin
+            target-cpu: generic
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository `self`
+        uses: actions/checkout@v4
+
+      - name: common-setup
+        uses: ./.github/actions/common-setup
+        with:
+          python-version: "3.12"
+
+      # > --------------------------------------------------
+      # > Repository
+      - name: Checkout repository `nautilus_trader`
+        uses: actions/checkout@v4
+        with:
+          repository: nautechsystems/nautilus_trader
+          ref: develop
+          path: src
 
       - name: common-wheel-build
         uses: ./.github/actions/common-wheel-build
