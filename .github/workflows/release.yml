@@ -17,7 +17,7 @@ jobs:
   publish-nautilus-trader:
     permissions:
       contents: write
-    name: publish ${{ matrix.os }} (${{ matrix.target-arch }} | ${{ matrix.target-cpu }})
+    name: publish ${{ matrix.os }} (${{ matrix.arch-cpu.target-arch }} | ${{ matrix.arch-cpu.target-cpu }})
     # runs-on: ubuntu-latest
     runs-on: ${{ matrix.os }}
     strategy:
@@ -26,7 +26,7 @@ jobs:
           - ubuntu-24.04
           - ubuntu-22.04
           # - macos-latest
-        include:
+        arch-cpu:
           # > x86_64-unknown-linux-gnu
           - target-arch: x86_64-unknown-linux-gnu
             target-cpu: generic # 默认
@@ -59,17 +59,17 @@ jobs:
         shell: bash
     env:
       BUILD_MODE: release
-      # TARGET_ARCH: ${{ matrix.target-arch }}
-      # TARGET_CPU: ${{ matrix.target-cpu }}
+      # TARGET_ARCH: ${{ matrix.arch-cpu.target-arch }}
+      # TARGET_CPU: ${{ matrix.arch-cpu.target-cpu }}
       # > --------------------------------------------------
       # > cargo
       CARGO_TARGET_DIR: ${{ github.workspace }}/.cache/cargo/target
       # CARGO_LOG: debug
       # CARGO_TERM_VERBOSE: true
       RUST_BACKTRACE: 1
-      CARGO_BUILD_TARGET: ${{ matrix.target-arch }}
-      RUSTFLAGS: -C target-cpu=${{ matrix.target-cpu }}
-      # -Z tune-cpu=${{ matrix.target-cpu }} # the option `Z` is only accepted on the nightly compiler
+      CARGO_BUILD_TARGET: ${{ matrix.arch-cpu.target-arch }}
+      RUSTFLAGS: -C target-cpu=${{ matrix.arch-cpu.target-cpu }}
+      # -Z tune-cpu=${{ matrix.arch-cpu.target-cpu }} # the option `Z` is only accepted on the nightly compiler
       # > --------------------------------------------------
       # > sccache
       # https://github.com/Mozilla-Actions/sccache-action
@@ -132,7 +132,7 @@ jobs:
       - name: Set up Rust toolchain
         run: |
           rustup self update
-          rustup target add ${{ matrix.target-arch }}
+          rustup target add ${{ matrix.arch-cpu.target-arch }}
           rustup update --force stable
           rustup toolchain add \
             --component clippy,rustfmt \
@@ -145,10 +145,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.SCCACHE_DIR }}
-          key: sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
+          key: sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.arch-cpu.target-arch }}-${{ matrix.arch-cpu.target-cpu }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
           restore-keys: |
-            sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-
-            sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-
+            sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.arch-cpu.target-arch }}-${{ matrix.arch-cpu.target-cpu }}-
+            sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.arch-cpu.target-arch }}-
             sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-
             sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-
             sccache-${{ runner.os }}-${{ matrix.os }}-
@@ -207,8 +207,8 @@ jobs:
       # > Build
       # - name: Update env vars
       #   run: |
-      #     echo 'CARGO_BUILD_TARGET=${{ matrix.target-arch }}' >> $GITHUB_ENV
-      #     echo 'RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }}' >> $GITHUB_ENV
+      #     echo 'CARGO_BUILD_TARGET=${{ matrix.arch-cpu.target-arch }}' >> $GITHUB_ENV
+      #     echo 'RUSTFLAGS=-C target-cpu=${{ matrix.arch-cpu.target-cpu }}' >> $GITHUB_ENV
 
       # - name: Print env vars
       #   run: |
@@ -223,7 +223,7 @@ jobs:
           base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
 
           dev_version="dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}"
-          local_version="cpu.${{ matrix.target-cpu }}"
+          local_version="cpu.${{ matrix.arch-cpu.target-cpu }}"
           new_version="${base_version}.${dev_version}.${local_version}"
 
           poetry version --directory=src ${new_version}
