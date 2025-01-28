@@ -217,7 +217,8 @@ jobs:
           base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
           suffix=".dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}.cpu.${{ matrix.target-cpu }}"
           new_version="${base_version}${suffix}"
-          yq -i '.tool.poetry.version = "${new_version}"' src/pyproject.toml
+
+          poetry version --directory=src ${new_version}
 
           echo "Set version to ${new_version}"
 
