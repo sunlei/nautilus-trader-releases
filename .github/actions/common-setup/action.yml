@@ -15,17 +15,25 @@ runs:
       shell: bash
       run: |
         echo "BUILD_MODE=release" >> $GITHUB_ENV
-        # echo "TARGET_ARCH=${{ matrix.arch-cpu.target-arch }}" >> $GITHUB_ENV
-        # echo "TARGET_CPU=${{ matrix.arch-cpu.target-cpu }}" >> $GITHUB_ENV
+        # echo "TARGET_ARCH=${{ matrix.target-arch }}" >> $GITHUB_ENV
+        # echo "TARGET_CPU=${{ matrix.target-cpu }}" >> $GITHUB_ENV
+
         # > --------------------------------------------------
         # > cargo
         echo "CARGO_TARGET_DIR=${{ github.workspace }}/.cache/cargo/target" >> $GITHUB_ENV
         # echo "CARGO_LOG=debug" >> $GITHUB_ENV
         # echo "CARGO_TERM_VERBOSE=true" >> $GITHUB_ENV
         echo "RUST_BACKTRACE=1" >> $GITHUB_ENV
-        echo "CARGO_BUILD_TARGET=${{ matrix.arch-cpu.target-arch }}" >> $GITHUB_ENV
-        echo "RUSTFLAGS=-C target-cpu=${{ matrix.arch-cpu.target-cpu }}" >> $GITHUB_ENV
-        # -Z tune-cpu=${{ matrix.arch-cpu.target-cpu }} # the option `Z` is only accepted on the nightly compiler
+
+        echo "CARGO_BUILD_TARGET=${{ matrix.target-arch }}" >> $GITHUB_ENV
+
+        # -Z tune-cpu=${{ matrix.target-cpu }} # the option `Z` is only accepted on the nightly compiler
+        if ${{ matrix.target-arch }} == "aarch64-apple-darwin"; then
+          echo "RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }} -C link-arg=-undefined -C link-arg=dynamic_lookup" >> $GITHUB_ENV
+        else
+          echo "RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }}" >> $GITHUB_ENV
+        fi
+
         # > --------------------------------------------------
         # > sccache
         # https://github.com/Mozilla-Actions/sccache-action
@@ -106,7 +114,7 @@ runs:
     - name: Set up Rust toolchain
       shell: bash
       run: |
-        rustup target add ${{ matrix.arch-cpu.target-arch }}
+        rustup target add ${{ matrix.target-arch }}
         rustup update --force stable
         rustup toolchain add \
           --component clippy,rustfmt \
@@ -119,10 +127,10 @@ runs:
       uses: actions/cache@v4
       with:
         path: ${{ env.SCCACHE_DIR }}
-        key: sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.arch-cpu.target-arch }}-${{ matrix.arch-cpu.target-cpu }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
+        key: sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
         restore-keys: |
-          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.arch-cpu.target-arch }}-${{ matrix.arch-cpu.target-cpu }}-
-          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.arch-cpu.target-arch }}-
+          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-
+          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-
           sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-
           sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-
           sccache-${{ runner.os }}-${{ matrix.os }}-

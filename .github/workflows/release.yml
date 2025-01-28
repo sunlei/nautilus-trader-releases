@@ -14,45 +14,29 @@ on:
 #     types: [on-demand-release]
 
 jobs:
-  publish-linux:
+  publish:
     permissions:
       contents: write
-    name: publish ${{ matrix.os }} (${{ matrix.arch-cpu.target-arch }} | ${{ matrix.arch-cpu.target-cpu }})
+    name: publish ${{ matrix.os }} (${{ matrix.target-arch }} | ${{ matrix.target-cpu }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os:
-          - ubuntu-24.04
-          - ubuntu-22.04
-          # - macos-latest
-        arch-cpu:
-          # > x86_64-unknown-linux-gnu
-          - target-arch: x86_64-unknown-linux-gnu
-            target-cpu: generic # 默认
-          # - target-arch: x86_64-unknown-linux-gnu
-          #   target-cpu: x86-64
-          # - target-arch: x86_64-unknown-linux-gnu
-          #   target-cpu: x86-64-v4
-          # - target-arch: x86_64-unknown-linux-gnu
-          #   target-cpu: cascadelake
-          # - target-arch: x86_64-unknown-linux-gnu
-          #   target-cpu: icelake-server
-          # - target-arch: x86_64-unknown-linux-gnu
-          #   target-cpu: skylake-avx512
-          - target-arch: x86_64-unknown-linux-gnu
+        include:
+          - os: ubuntu-22.04
+            target-arch: x86_64-unknown-linux-gnu
+            target-cpu: generic
+          - os: ubuntu-22.04
+            target-arch: x86_64-unknown-linux-gnu
             target-cpu: sapphirerapids
-          # - target-arch: x86_64-unknown-linux-gnu
-          #   target-cpu: emeraldrapids
-
-          # > aarch64-unknown-linux-gnu
-          # - target-arch: aarch64-unknown-linux-gnu
-          #   target-cpu: generic # 默认
-          # - target-arch: aarch64-unknown-linux-gnu
-          #   target-cpu: neoverse-n1 # Graviton2
-          # - target-arch: aarch64-unknown-linux-gnu
-          #   target-cpu: neoverse-v1 # Graviton3
-          # - target-arch: aarch64-unknown-linux-gnu
-          #   target-cpu: neoverse-v2 # Graviton4
+          - os: ubuntu-24.04
+            target-arch: x86_64-unknown-linux-gnu
+            target-cpu: generic
+          - os: ubuntu-24.04
+            target-arch: x86_64-unknown-linux-gnu
+            target-cpu: sapphirerapids
+          - os: macos-latest
+            target-arch: aarch64-apple-darwin
+            target-cpu: generic
     defaults:
       run:
         shell: bash
@@ -85,42 +69,6 @@ jobs:
       #   run: |
       #     which yq
       #     yq --version
-
-      - name: common-wheel-build
-        uses: ./.github/actions/common-wheel-build
-
-  publish-macos:
-    permissions:
-      contents: write
-    name: publish ${{ matrix.os }} (${{ matrix.arch-cpu.target-arch }} | ${{ matrix.arch-cpu.target-cpu }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - macos-latest
-        arch-cpu:
-          - target-arch: aarch64-apple-darwin
-            target-cpu: generic
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout repository `self`
-        uses: actions/checkout@v4
-
-      - name: common-setup
-        uses: ./.github/actions/common-setup
-        with:
-          python-version: "3.12"
-
-      # > --------------------------------------------------
-      # > Repository
-      - name: Checkout repository `nautilus_trader`
-        uses: actions/checkout@v4
-        with:
-          repository: nautechsystems/nautilus_trader
-          ref: develop
-          path: src
 
       - name: common-wheel-build
         uses: ./.github/actions/common-wheel-build

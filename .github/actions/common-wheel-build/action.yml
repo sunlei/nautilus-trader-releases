@@ -14,8 +14,8 @@ runs:
     # > Build
     # - name: Update env vars
     #   run: |
-    #     echo 'CARGO_BUILD_TARGET=${{ matrix.arch-cpu.target-arch }}' >> $GITHUB_ENV
-    #     echo 'RUSTFLAGS=-C target-cpu=${{ matrix.arch-cpu.target-cpu }}' >> $GITHUB_ENV
+    #     echo 'CARGO_BUILD_TARGET=${{ matrix.target-arch }}' >> $GITHUB_ENV
+    #     echo 'RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }}' >> $GITHUB_ENV
 
     # - name: Print env vars
     #   run: |
@@ -33,7 +33,7 @@ runs:
         # Example: 1.208.0.dev20251212+7001.cpu.sapphirerapids
 
         base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
-        target_cpu=${{ matrix.arch-cpu.target-cpu }}
+        target_cpu=${{ matrix.target-cpu }}
 
         dev_version="dev$(date -u +%Y%m%d)+${GITHUB_RUN_NUMBER}"
         release_version=${base_version}.${dev_version}
