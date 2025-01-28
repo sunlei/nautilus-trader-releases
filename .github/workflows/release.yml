@@ -37,6 +37,9 @@ jobs:
           - os: macos-latest
             target-arch: aarch64-apple-darwin
             target-cpu: generic
+    env:
+      TARGET_ARCH: ${{ matrix.target-arch }}
+      TARGET_CPU: ${{ matrix.target-cpu }}
     defaults:
       run:
         shell: bash
