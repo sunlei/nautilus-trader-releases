@@ -34,7 +34,7 @@ jobs:
           - os: ubuntu-24.04
             target-arch: x86_64-unknown-linux-gnu
             target-cpu: sapphirerapids
-          - os: macos-15-xlarge
+          - os: macos-15
             target-arch: aarch64-apple-darwin
             target-cpu: "" # 使用 generic 时，ring 无法编译
     env:
