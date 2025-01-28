@@ -1,0 +1,115 @@
+name: common-setup
+description: Common environment setup
+
+inputs:
+  python-version:
+    description: The Python version to setup
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    # > --------------------------------------------------
+    # > OS
+    - name: Install / Update OS dependencies
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt install -y \
+          curl \
+          clang \
+          git \
+          libssl-dev \
+          make \
+          pkg-config \
+          g++-aarch64-linux-gnu \
+          gcc-aarch64-linux-gnu \
+          binutils
+
+    - name: Setup mold
+      if: runner.os == 'Linux'
+      uses: rui314/setup-mold@v1
+
+    # > --------------------------------------------------
+    # > Python
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      id: python-install
+      with:
+        python-version: ${{ inputs.python-version }}
+        # python-version: "3.13"
+        # python-version-file: "src/pyproject.toml"
+        # python-version-file: ".python-version"
+        # cache: "poetry"
+
+    # - name: Install uv
+    #   uses: astral-sh/setup-uv@v5
+    #   with:
+    #     enable-cache: true
+
+    - name: Update env vars
+      shell: bash
+      run: |
+        echo 'PIPX_DEFAULT_PYTHON=${{ steps.python-install.outputs.python-path }}' >> $GITHUB_ENV
+
+    - name: Install poetry
+      shell: bash
+      run: |
+        pipx install poetry
+
+    # > --------------------------------------------------
+    # > Rust
+    - name: Cached cargo
+      uses: actions/cache@v4
+      # https://doc.rust-lang.org/cargo/guide/cargo-home.html#caching-the-cargo-home-in-ci
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: ${{ runner.os }}-cargo-
+
+    - name: Set up Rust toolchain
+      shell: bash
+      run: |
+        rustup self update
+        rustup target add ${{ matrix.arch-cpu.target-arch }}
+        rustup update --force stable
+        rustup toolchain add \
+          --component clippy,rustfmt \
+          --profile minimal \
+          stable
+
+    # > --------------------------------------------------
+    # > sccache
+    - name: Cached sccache
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.SCCACHE_DIR }}
+        key: sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.arch-cpu.target-arch }}-${{ matrix.arch-cpu.target-cpu }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
+        restore-keys: |
+          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.arch-cpu.target-arch }}-${{ matrix.arch-cpu.target-cpu }}-
+          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.arch-cpu.target-arch }}-
+          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-
+          sccache-${{ runner.os }}-${{ matrix.os }}-${{ github.workflow }}-
+          sccache-${{ runner.os }}-${{ matrix.os }}-
+
+    - name: Run sccache
+      uses: mozilla-actions/sccache-action@v0.0.7
+
+    # > --------------------------------------------------
+    # > mise
+    # - name: Setup mise
+    #   shell: bash
+    #   run: |
+    #     curl https://mise.run | sh
+    #     echo "$HOME/.local/share/mise/bin" >> $GITHUB_PATH
+    #     echo "$HOME/.local/share/mise/shims" >> $GITHUB_PATH
+
+    # - name: Install yq
+    #   shell: bash
+    #   run: |
+    #     mise use -g yq
