@@ -47,7 +47,7 @@ runs:
     - name: List dist
       shell: bash
       run: |
-        tree src/dist
+        ls -alh src/dist
 
     - name: Release
       uses: softprops/action-gh-release@v2
