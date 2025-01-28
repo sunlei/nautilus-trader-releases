@@ -28,7 +28,7 @@ runs:
         echo "CARGO_BUILD_TARGET=${{ matrix.target-arch }}" >> $GITHUB_ENV
 
         # -Z tune-cpu=${{ matrix.target-cpu }} # the option `Z` is only accepted on the nightly compiler
-        if ${{ matrix.target-arch }} == "aarch64-apple-darwin"; then
+        if "${{ matrix.target-arch }}" == "aarch64-apple-darwin"; then
           echo "RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }} -C link-arg=-undefined -C link-arg=dynamic_lookup" >> $GITHUB_ENV
         else
           echo "RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }}" >> $GITHUB_ENV
