@@ -99,15 +99,15 @@ jobs:
 
       # > --------------------------------------------------
       # > Repository
+      - name: Checkout repository `self`
+        uses: actions/checkout@v4
+
       - name: Checkout repository `nautilus_trader`
         uses: actions/checkout@v4
         with:
           repository: nautechsystems/nautilus_trader
           ref: develop
           path: src
-
-      - name: Checkout repository `self`
-        uses: actions/checkout@v4
 
       # > --------------------------------------------------
       # > Rust
