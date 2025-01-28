@@ -217,12 +217,12 @@ jobs:
         run: |
           base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
 
-          release_version="dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}"
-          target_cpu="cpu.${{ matrix.target-cpu }}"
-          new_version="${base_version}.${release_version}.${target_cpu}"
+          dev_version="dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}"
+          local_version="cpu.${{ matrix.target-cpu }}"
+          new_version="${base_version}.${dev_version}.${local_version}"
 
           poetry version --directory=src ${new_version}
-          echo "RELEASE_VERSION=${release_version}" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=${base_version}.${dev_version}" >> $GITHUB_ENV
 
           echo "Set version to ${new_version}"
 
