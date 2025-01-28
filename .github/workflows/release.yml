@@ -39,6 +39,7 @@ jobs:
             target-cpu: sapphirerapids
           # - target-arch: x86_64-unknown-linux-gnu
           #   target-cpu: emeraldrapids
+
           # > aarch64-unknown-linux-gnu
           # - target-arch: aarch64-unknown-linux-gnu
           #   target-cpu: generic # 默认
@@ -212,13 +213,14 @@ jobs:
         run: |
           cp scripts/build.py src/build.py
 
-      - name: Update version in `pyproject.toml`
+      - name: Set version
         run: |
           base_version=$(yq -r '.tool.poetry.version' src/pyproject.toml)
           suffix=".dev$(date +%Y%m%d)+${GITHUB_RUN_NUMBER}.cpu.${{ matrix.target-cpu }}"
           new_version="${base_version}${suffix}"
 
           poetry version --directory=src ${new_version}
+          echo "RELEASE_VERSION=${new_version}" >> $GITHUB_ENV
 
           echo "Set version to ${new_version}"
 
@@ -231,10 +233,16 @@ jobs:
       - name: Build NautilusTrader
         run: |
           pushd src
-          # poetry install
           poetry build --format wheel
           popd
 
       - name: List dist
         run: |
           tree src/dist
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: src/dist/*
+          tag_name: v${{ env.RELEASE_VERSION }}
+          name: v${{ env.RELEASE_VERSION }}
