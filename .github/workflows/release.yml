@@ -22,18 +22,30 @@ jobs:
     strategy:
       matrix:
         include:
+          # > --------------------------------------------------
+          # > Ubuntu 22.04
           - os: ubuntu-22.04
             target-arch: x86_64-unknown-linux-gnu
             target-cpu: generic
           - os: ubuntu-22.04
             target-arch: x86_64-unknown-linux-gnu
             target-cpu: sapphirerapids
+          - os: ubuntu-22.04
+            target-arch: x86_64-unknown-linux-gnu
+            target-cpu: x86-64-v4
+          # > --------------------------------------------------
+          # > Ubuntu 24.04
           - os: ubuntu-24.04
             target-arch: x86_64-unknown-linux-gnu
             target-cpu: generic
           - os: ubuntu-24.04
             target-arch: x86_64-unknown-linux-gnu
             target-cpu: sapphirerapids
+          - os: ubuntu-24.04
+            target-arch: x86_64-unknown-linux-gnu
+            target-cpu: x86-64-v4
+          # > --------------------------------------------------
+          # > macOS 15
           - os: macos-15
             target-arch: aarch64-apple-darwin
             target-cpu: "apple-m1" # 使用 `generic` 时，ring 无法编译 / `apple-m1`
