@@ -20,7 +20,7 @@ set -euo pipefail
 
   # > --------------------------------------------------
   # > cargo
-  echo "MACOSX_DEPLOYMENT_TARGET=15.0"
+  # echo "MACOSX_DEPLOYMENT_TARGET=15.0"
   echo "CARGO_TARGET_DIR=${GITHUB_WORKSPACE}/.cache/cargo/target"
   # echo "CARGO_LOG=debug"
   # echo "CARGO_TERM_VERBOSE=true"
@@ -29,9 +29,17 @@ set -euo pipefail
   echo "CARGO_BUILD_TARGET=${TARGET_ARCH}"
 
   # -Z tune-cpu=${TARGET_CPU} # the option `Z` is only accepted on the nightly compiler
+  # -C linker=clang
+  RUSTFLAGS=""
 
   if [[ "${TARGET_CPU}" != "" ]]; then
-    echo "RUSTFLAGS=-C target-cpu=${TARGET_CPU}"
+    RUSTFLAGS+=" -C target-cpu=${TARGET_CPU}"
   fi
+
+  if [[ "${TARGET_ARCH}" == "aarch64-apple-darwin" ]]; then
+    RUSTFLAGS+=" -C link-arg=-undefined -C link-arg=dynamic_lookup"
+  fi
+
+  echo "RUSTFLAGS=${RUSTFLAGS}"
 
 } >>"${GITHUB_ENV}"
