@@ -20,6 +20,7 @@ set -euo pipefail
 
   # > --------------------------------------------------
   # > cargo
+  echo "MACOSX_DEPLOYMENT_TARGET=15.0"
   echo "CARGO_TARGET_DIR=${GITHUB_WORKSPACE}/.cache/cargo/target"
   # echo "CARGO_LOG=debug"
   # echo "CARGO_TERM_VERBOSE=true"
