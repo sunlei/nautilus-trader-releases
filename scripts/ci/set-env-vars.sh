@@ -31,7 +31,7 @@ set -euo pipefail
   # -Z tune-cpu=${TARGET_CPU} # the option `Z` is only accepted on the nightly compiler
 
   if [[ "${TARGET_CPU}" != "" ]]; then
-    echo "RUSTFLAGS=-C target-cpu=${TARGET_CPU} -C linker=clang"
+    echo "RUSTFLAGS=-C target-cpu=${TARGET_CPU}"
   fi
 
 } >>"${GITHUB_ENV}"
