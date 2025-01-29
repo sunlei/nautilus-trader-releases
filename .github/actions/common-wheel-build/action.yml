@@ -1,0 +1,57 @@
+name: common-wheel-build
+description: Common wheel build and install
+
+inputs:
+  python-version:
+    description: The Python version to setup
+    required: true
+
+# This action runs for linux and macos only
+runs:
+  using: "composite"
+  steps:
+    # > --------------------------------------------------
+    # > Build
+    # - name: Update env vars
+    #   run: |
+    #     echo 'CARGO_BUILD_TARGET=${{ matrix.target-arch }}' >> $GITHUB_ENV
+    #     echo 'RUSTFLAGS=-C target-cpu=${{ matrix.target-cpu }}' >> $GITHUB_ENV
+
+    # - name: Print env vars
+    #   run: |
+    #     env | sort
+
+    - name: Replace `build.py`
+      shell: bash
+      run: |
+        cp scripts/build.py src/build.py
+
+    - name: Set version
+      shell: bash
+      run: |
+        bash ./scripts/ci/set-version.sh
+
+    # - name: Install NautilusTrader
+    #   run: |
+    #     pushd src
+    #     poetry install
+    #     popd
+
+    - name: Build NautilusTrader
+      shell: bash
+      run: |
+        pushd src
+        poetry build --format wheel
+        popd
+
+    - name: List dist
+      shell: bash
+      run: |
+        ls -alh src/dist
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: src/dist/*
+        tag_name: v${{ env.RELEASE_VERSION }}
+        name: v${{ env.RELEASE_VERSION }}
