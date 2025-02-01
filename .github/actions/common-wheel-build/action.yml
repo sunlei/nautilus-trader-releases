@@ -48,10 +48,3 @@ runs:
       shell: bash
       run: |
         ls -alh src/dist
-
-    - name: Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: src/dist/*
-        tag_name: v${{ env.RELEASE_VERSION }}
-        name: v${{ env.RELEASE_VERSION }}
