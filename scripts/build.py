@@ -138,7 +138,6 @@ def _build_rust_libs() -> None:
 
         subprocess.run(
             cmd_args,
-            cwd="nautilus_core",
             check=True,
         )
     except subprocess.CalledProcessError as e:
@@ -308,7 +307,13 @@ def _get_clang_version() -> str:
             check=True,
             capture_output=True,
         )
-        output = result.stdout.decode().splitlines()[0].lstrip("Apple ").lstrip("Ubuntu ").lstrip("clang version ")
+        output = (
+            result.stdout.decode()
+            .splitlines()[0]
+            .lstrip("Apple ")
+            .lstrip("Ubuntu ")
+            .lstrip("clang version ")
+        )
         return output
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
         err_msg = str(e) if isinstance(e, FileNotFoundError) else e.stderr.decode()
@@ -410,7 +415,11 @@ if __name__ == "__main__":
     print(f"LDSHARED={os.environ['LDSHARED']}") if "LDSHARED" in os.environ else None
     print(f"CFLAGS={os.environ['CFLAGS']}") if "CFLAGS" in os.environ else None
     print(f"LDFLAGS={os.environ['LDFLAGS']}") if "LDFLAGS" in os.environ else None
-    (print(f"LD_LIBRARY_PATH={os.environ['LD_LIBRARY_PATH']}") if "LD_LIBRARY_PATH" in os.environ else None)
+    (
+        print(f"LD_LIBRARY_PATH={os.environ['LD_LIBRARY_PATH']}")
+        if "LD_LIBRARY_PATH" in os.environ
+        else None
+    )
 
     print("\nStarting build...")
     ts_start = dt.datetime.now(dt.UTC)
