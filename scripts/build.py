@@ -94,7 +94,7 @@ else:  # Linux
 
 CARGO_TARGET_DIR = Path(os.environ.get("CARGO_TARGET_DIR", Path.cwd() / "nautilus_core" / "target"))
 CARGO_BUILD_TARGET = os.environ.get("CARGO_BUILD_TARGET", "")
-CARGO_TARGET_DIR = CARGO_TARGET_DIR / (CARGO_BUILD_TARGET if CARGO_BUILD_TARGET else "") / BUILD_MODE
+CARGO_TARGET_DIR = CARGO_TARGET_DIR / CARGO_BUILD_TARGET / BUILD_MODE
 
 # Directories with headers to include
 RUST_INCLUDES = ["nautilus_trader/core/includes"]
