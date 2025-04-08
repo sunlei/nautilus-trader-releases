@@ -49,16 +49,16 @@ runs:
         # python-version-file: ".python-version"
         # cache: "poetry"
 
-    # - name: Install uv
-    #   uses: astral-sh/setup-uv@v5
-    #   with:
-    #     enable-cache: true
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
 
-    - name: Install poetry
-      shell: bash
-      run: |
-        echo "PIPX_DEFAULT_PYTHON=${{ steps.python-install.outputs.python-path }}" >> $GITHUB_ENV
-        pipx install poetry
+    # - name: Install poetry
+    #   shell: bash
+    #   run: |
+    #     echo "PIPX_DEFAULT_PYTHON=${{ steps.python-install.outputs.python-path }}" >> $GITHUB_ENV
+    #     pipx install poetry
 
     # > --------------------------------------------------
     # > Rust
@@ -91,7 +91,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ${{ env.SCCACHE_DIR }}
-        key: sccache-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-${{ hashFiles('**/Cargo.lock', '**/poetry.lock') }}
+        key: sccache-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-${{ hashFiles('**/Cargo.lock', '**/uv.lock') }}
         restore-keys: |
           sccache-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-${{ matrix.target-cpu }}-
           sccache-${{ matrix.os }}-${{ github.workflow }}-${{ github.job }}-${{ matrix.target-arch }}-

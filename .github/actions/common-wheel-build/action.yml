@@ -41,7 +41,8 @@ runs:
       shell: bash
       run: |
         pushd src
-        poetry build --format wheel
+        # poetry build --format wheel
+        BUILD_MODE=release uv run --active --no-sync build.py
         popd
 
     - name: List dist
