@@ -42,7 +42,9 @@ runs:
       run: |
         pushd src
         # poetry build --format wheel
-        BUILD_MODE=release uv run --with numpy --active --no-sync build.py
+        make install
+        make build
+        make build-wheel
         popd
 
     - name: List dist
