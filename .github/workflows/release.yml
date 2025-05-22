@@ -50,6 +50,9 @@ jobs:
           - os: macos-15
             target-arch: aarch64-apple-darwin
             target-cpu: "apple-m1" # 使用 `generic` 时，ring 无法编译 / `apple-m1`
+          - os: macos-15-large
+            target-arch: x86_64-apple-darwin
+            target-cpu: "generic"
     env:
       TARGET_ARCH: ${{ matrix.target-arch }}
       TARGET_CPU: ${{ matrix.target-cpu }}
