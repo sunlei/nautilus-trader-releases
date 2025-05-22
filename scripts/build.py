@@ -24,11 +24,11 @@ from setuptools import Extension
 IS_LINUX = platform.system() == "Linux"
 IS_MACOS = platform.system() == "Darwin"
 IS_WINDOWS = platform.system() == "Windows"
-IS_ARM64 = platform.machine() == "arm64"
+IS_ARM64 = platform.machine() in ("arm64", "aarch64")
 
 
 # The Rust toolchain to use for builds
-RUST_TOOLCHAIN = os.getenv("RUST_TOOLCHAIN", "stable")
+RUSTUP_TOOLCHAIN = os.getenv("RUSTUP_TOOLCHAIN", "stable")
 # The Cargo build mode
 BUILD_MODE = os.getenv("BUILD_MODE", "release")
 # If PROFILE_MODE mode is enabled, include traces necessary for coverage and profiling
@@ -41,6 +41,8 @@ PARALLEL_BUILD = os.getenv("PARALLEL_BUILD", "true").lower() == "true"
 COPY_TO_SOURCE = os.getenv("COPY_TO_SOURCE", "true").lower() == "true"
 # If PyO3 only then don't build C extensions to reduce compilation time
 PYO3_ONLY = os.getenv("PYO3_ONLY", "").lower() != ""
+# If dry run only print the commands that would be executed
+DRY_RUN = bool(os.getenv("DRY_RUN", ""))
 
 # Precision mode configuration
 # https://nautilustrader.io/docs/nightly/getting_started/installation#precision-mode
@@ -77,6 +79,18 @@ if IS_MACOS and IS_ARM64:
     os.environ["CFLAGS"] = "-arch arm64"
     os.environ["LDFLAGS"] = "-arch arm64 -w"
 
+if IS_LINUX and IS_ARM64:
+    os.environ["CFLAGS"] = f"{os.environ.get('CFLAGS', '')} -fPIC"
+    os.environ["LDFLAGS"] = f"{os.environ.get('LDFLAGS', '')} -fPIC"
+
+    python_lib_dir = os.environ.get("PYTHON_LIB_DIR")
+    python_version = ".".join(platform.python_version_tuple()[:2])  # e.g. "3.12"
+
+    if python_lib_dir:
+        print(f"Setting RUSTFLAGS to link with Python {python_version} in {python_lib_dir}")
+        rustflags = f"{os.environ.get('RUSTFLAGS', '')} -C link-arg=-L{python_lib_dir} -C link-arg=-lpython{python_version}"
+        os.environ["RUSTFLAGS"] = rustflags
+
 if IS_WINDOWS:
     # Linker error 1181
     # https://docs.microsoft.com/en-US/cpp/error-messages/tool-errors/linker-tools-error-lnk1181?view=msvc-170&viewFallbackFrom=vs-2019
@@ -108,30 +122,34 @@ RUST_LIB_PATHS: list[Path] = [
 RUST_LIBS: list[str] = [str(path) for path in RUST_LIB_PATHS]
 
 
+def _set_feature_flags() -> list[str]:
+    if HIGH_PRECISION:
+        return ["--features", "high-precision,ffi,python,extension-module"]
+    else:
+        return ["--features", "ffi,python,extension-module"]
+
+
 def _build_rust_libs() -> None:
     print("Compiling Rust libraries...")
 
     try:
         # Build the Rust libraries using Cargo
-        if RUST_TOOLCHAIN not in ("stable", "nightly"):
-            raise ValueError(f"Invalid `RUST_TOOLCHAIN` '{RUST_TOOLCHAIN}'")
+        if RUSTUP_TOOLCHAIN not in ("stable", "nightly"):
+            raise ValueError(f"Invalid `RUSTUP_TOOLCHAIN` '{RUSTUP_TOOLCHAIN}'")
 
         build_options = " --release" if BUILD_MODE == "release" else ""
 
-        if HIGH_PRECISION:
-            features = ["--all-features"]
-        else:
-            # Enable features needed for main build, but not high_precision
-            features = ["--features", "ffi,python,extension-module"]
+        features = _set_feature_flags()
 
         cmd_args = [
             "cargo",
             "build",
+            "--lib",
             *build_options.split(),
             *features,
         ]
 
-        if RUST_TOOLCHAIN == "nightly":
+        if RUSTUP_TOOLCHAIN == "nightly":
             cmd_args.insert(1, "+nightly")
 
         print(" ".join(cmd_args))
@@ -168,7 +186,7 @@ CYTHON_COMPILER_DIRECTIVES = {
 }
 
 # TODO: Temporarily separate Cython configuration while we require v3.0.11 for coverage
-if cython_compiler_version == "3.1.0b1":
+if cython_compiler_version == "3.1.0":
     Options.warning_errors = True  # Treat compiler warnings as errors
     Options.extra_warnings = True
     CYTHON_COMPILER_DIRECTIVES["warn.deprecated.IF"] = False
@@ -360,6 +378,38 @@ def _strip_unneeded_symbols() -> None:
         raise RuntimeError(f"Error when stripping symbols.\n{e}") from e
 
 
+def show_rustanalyzer_settings() -> None:
+    """
+    Show appropriate vscode settings for the build.
+    """
+    import json
+
+    # Set environment variables
+    settings: dict[str, object] = {}
+    for key in [
+        "rust-analyzer.check.extraEnv",
+        "rust-analyzer.runnables.extraEnv",
+        "rust-analyzer.cargo.features",
+    ]:
+        settings[key] = {
+            "CC": os.environ["CC"],
+            "CXX": os.environ["CXX"],
+            "VIRTUAL_ENV": os.environ["VIRTUAL_ENV"],
+        }
+
+    # Set features
+    features = _set_feature_flags()
+    if features[0] == "--all-features":
+        settings["rust-analyzer.cargo.features"] = "all"
+        settings["rust-analyzer.check.features"] = "all"
+    else:
+        settings["rust-analyzer.cargo.features"] = features[1].split(",")
+        settings["rust-analyzer.check.features"] = features[1].split(",")
+
+    print("Set these rust analyzer settings in .vscode/settings.json")
+    print(json.dumps(settings, indent=2))
+
+
 def build() -> None:
     """
     Construct the extensions and distribution.
@@ -389,6 +439,12 @@ def build() -> None:
         _strip_unneeded_symbols()
 
 
+def print_env_var_if_exists(key: str) -> None:
+    value = os.environ.get(key)
+    if value is not None:
+        print(f"{key}={value}")
+
+
 if __name__ == "__main__":
     print("\033[36m")
     print("=====================================================================")
@@ -401,7 +457,7 @@ if __name__ == "__main__":
     print(f"Cython: {cython_compiler_version}")
     print(f"NumPy:  {np.__version__}")
 
-    print(f"\nRUST_TOOLCHAIN={RUST_TOOLCHAIN}")
+    print(f"\nRUSTUP_TOOLCHAIN={RUSTUP_TOOLCHAIN}")
     print(f"BUILD_MODE={BUILD_MODE}")
     print(f"BUILD_DIR={BUILD_DIR}")
     print(f"HIGH_PRECISION={HIGH_PRECISION}")
@@ -410,19 +466,20 @@ if __name__ == "__main__":
     print(f"PARALLEL_BUILD={PARALLEL_BUILD}")
     print(f"COPY_TO_SOURCE={COPY_TO_SOURCE}")
     print(f"PYO3_ONLY={PYO3_ONLY}")
-    print(f"CC={os.environ['CC']}") if "CC" in os.environ else None
-    print(f"CXX={os.environ['CXX']}") if "CXX" in os.environ else None
-    print(f"LDSHARED={os.environ['LDSHARED']}") if "LDSHARED" in os.environ else None
-    print(f"CFLAGS={os.environ['CFLAGS']}") if "CFLAGS" in os.environ else None
-    print(f"LDFLAGS={os.environ['LDFLAGS']}") if "LDFLAGS" in os.environ else None
-    (
-        print(f"LD_LIBRARY_PATH={os.environ['LD_LIBRARY_PATH']}")
-        if "LD_LIBRARY_PATH" in os.environ
-        else None
-    )
+    print_env_var_if_exists("CC")
+    print_env_var_if_exists("CXX")
+    print_env_var_if_exists("LDSHARED")
+    print_env_var_if_exists("CFLAGS")
+    print_env_var_if_exists("LDFLAGS")
+    print_env_var_if_exists("LD_LIBRARY_PATH")
+    print_env_var_if_exists("RUSTFLAGS")
+    print_env_var_if_exists("DRY_RUN")
 
-    print("\nStarting build...")
-    ts_start = dt.datetime.now(dt.UTC)
-    build()
-    print(f"Build time: {dt.datetime.now(dt.UTC) - ts_start}")
-    print("\033[32m" + "Build completed" + "\033[0m")
+    if DRY_RUN:
+        show_rustanalyzer_settings()
+    else:
+        print("\nStarting build...")
+        ts_start = dt.datetime.now(dt.UTC)
+        build()
+        print(f"Build time: {dt.datetime.now(dt.UTC) - ts_start}")
+        print("\033[32m" + "Build completed" + "\033[0m")

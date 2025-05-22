@@ -21,10 +21,10 @@ runs:
     #   run: |
     #     env | sort
 
-    - name: Replace `build.py`
-      shell: bash
-      run: |
-        cp scripts/build.py src/build.py
+    # - name: Replace `build.py`
+    #   shell: bash
+    #   run: |
+    #     cp scripts/build.py src/build.py
 
     - name: Set version
       shell: bash

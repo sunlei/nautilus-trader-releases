@@ -29,7 +29,9 @@ runs:
           libssl-dev \
           make \
           pkg-config \
-          binutils
+          binutils \
+          capnproto \
+          libcapnp-dev
       # g++-aarch64-linux-gnu \
       # gcc-aarch64-linux-gnu \
 
