@@ -7,8 +7,8 @@ on:
       - master
       - nightly
       - develop
-  schedule:
-    - cron: "0 0 * * *"
+  # schedule:
+  #   - cron: "0 0 * * *"
 
 # on:
 #   repository_dispatch:
