@@ -39,7 +39,7 @@ jobs:
           - os: macos-15
             target-arch: aarch64-apple-darwin
             target-cpu: "apple-m1" # 使用 `generic` 时，ring 无法编译 / `apple-m1`
-          - os: macos-15-large
+          - os: macos-13
             target-arch: x86_64-apple-darwin
             target-cpu: "generic"
     env:
