@@ -52,10 +52,10 @@ jobs:
       # > --------------------------------------------------
       # > Repository
       - name: Checkout repository `self`
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Checkout repository `nautilus_trader`
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         id: nautilus-trader-checkout
         with:
           repository: nautechsystems/nautilus_trader
