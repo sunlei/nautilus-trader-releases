@@ -25,12 +25,15 @@ jobs:
         include:
           # > --------------------------------------------------
           # > Ubuntu 24.04
-          - os: ubuntu-24.04
-            target-arch: x86_64-unknown-linux-gnu
-            target-cpu: generic
-          - os: ubuntu-24.04
-            target-arch: x86_64-unknown-linux-gnu
-            target-cpu: sapphirerapids
+          # NOTE: 编译出的 whl 命名没有区别，造成覆盖，因此使用 `x86-64-v4` 作为默认
+          # /lib64/ld-linux-x86-64.so.2 --help
+          # https://ianwwagner.com/optimizing-rust-builds-with-target-flags.html
+          # - os: ubuntu-24.04
+          #   target-arch: x86_64-unknown-linux-gnu
+          #   target-cpu: generic
+          # - os: ubuntu-24.04
+          #   target-arch: x86_64-unknown-linux-gnu
+          #   target-cpu: sapphirerapids
           - os: ubuntu-24.04
             target-arch: x86_64-unknown-linux-gnu
             target-cpu: x86-64-v4
