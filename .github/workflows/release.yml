@@ -59,7 +59,7 @@ jobs:
         id: nautilus-trader-checkout
         with:
           repository: nautechsystems/nautilus_trader
-          ref: develop
+          ref: rust-bybit
           path: src
 
       # > --------------------------------------------------
