@@ -35,9 +35,9 @@ runs:
       # g++-aarch64-linux-gnu \
       # gcc-aarch64-linux-gnu \
 
-    - name: Setup mold
-      if: runner.os == 'Linux'
-      uses: rui314/setup-mold@v1
+    # - name: Setup mold
+    #   if: runner.os == 'Linux'
+    #   uses: rui314/setup-mold@v1
 
     # > --------------------------------------------------
     # > Python
